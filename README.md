@@ -1,7 +1,7 @@
 
 ## Playing Flappy Bird Using Deep Reinforcement Learning (Based on Deep Q Learning DQN)
 
-![Video](https://www.youtube.com/embed/Hi0-eZsQn_c?rel=0)
+[Train Video](https://www.youtube.com/embed/Hi0-eZsQn_c?rel=0)
 
 ## Include NIPS 2013 version and Nature Version DQN
 

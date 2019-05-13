@@ -5,6 +5,7 @@ import wrapped_flappy_bird as game
 from BrainDQN_Nature import BrainDQN
 import numpy as np
 
+
 # preprocess raw image to 80*80 gray image
 def preprocess(observation):
 	observation = cv2.cvtColor(cv2.resize(observation, (80, 80)), cv2.COLOR_BGR2GRAY)
@@ -31,6 +32,7 @@ def playFlappyBird():
 		nextObservation,reward,terminal = flappyBird.frame_step(action)
 		nextObservation = preprocess(nextObservation)
 		brain.setPerception(nextObservation,action,reward,terminal)
+		brain.plotQmax()   #csy add
 
 def main():
 	playFlappyBird()

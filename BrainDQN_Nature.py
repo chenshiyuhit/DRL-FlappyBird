@@ -3,16 +3,20 @@ import numpy as np
 import random
 from collections import deque 
 
+import matplotlib.pyplot as plt   #csy add
+
 # Hyper Parameters:
 FRAME_PER_ACTION = 1
 GAMMA = 0.99 # decay rate of past observations
-OBSERVE = 100. # timesteps to observe before training
+OBSERVE = 1000. # timesteps to observe before training
 EXPLORE = 20000. # frames over which to anneal epsilon
 FINAL_EPSILON = 0.001 # final value of epsilon
 INITIAL_EPSILON = 0.01 # starting value of epsilon
 REPLAY_MEMORY = 50000 # number of previous transitions to remember
 BATCH_SIZE = 32 # size of minibatch
 UPDATE_TIME = 100
+
+QValue_tt = [] #csy add
 
 try:
     tf.mul
@@ -46,12 +50,13 @@ class BrainDQN:
 		self.session = tf.InteractiveSession()
 		self.session.run(tf.initialize_all_variables())
 		checkpoint = tf.train.get_checkpoint_state("saved_networks")
+		
 		if checkpoint and checkpoint.model_checkpoint_path:
 				self.saver.restore(self.session, checkpoint.model_checkpoint_path)
 				print ("Successfully loaded:", checkpoint.model_checkpoint_path)
 		else:
 				print ("Could not find old network weights")
-
+  		
 
 	def createQNetwork(self):
 		# network weights
@@ -128,7 +133,7 @@ class BrainDQN:
 			})
 
 		# save network every 100000 iteration
-		if self.timeStep % 10000 == 0:
+		if self.timeStep % 100000000 == 0:
 			self.saver.save(self.session, 'saved_networks/' + 'network' + '-dqn', global_step = self.timeStep)
 
 		if self.timeStep % UPDATE_TIME == 0:
@@ -154,11 +159,27 @@ class BrainDQN:
 		else:
 			state = "train"
 
+
+		QValue_t = self.QValue.eval(feed_dict= {self.stateInput:[self.currentState]})[0]   #csy add
+
 		print ("TIMESTEP", self.timeStep, "/ STATE", state, \
-            "/ EPSILON", self.epsilon)
+            "/ EPSILON", self.epsilon, "/ Q_max", np.max(QValue_t))     #csy revise
+
+		#csy add
+		QValue_tt.append(np.max(QValue_t))
+		#print(QValue_tt)
 
 		self.currentState = newState
 		self.timeStep += 1
+
+
+	def plotQmax(self):
+		if self.timeStep > 500000:
+			plt.plot(QValue_tt)
+			plt.show()
+			plt.pause(0.5)
+			plt.close()
+
 
 	def getAction(self):
 		QValue = self.QValue.eval(feed_dict= {self.stateInput:[self.currentState]})[0]
